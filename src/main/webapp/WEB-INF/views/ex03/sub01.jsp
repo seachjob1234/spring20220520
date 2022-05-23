@@ -175,6 +175,8 @@
 				}
 			});
 		});
+		$("#btnN").click(function(){ $(location).attr("href", "https://www.naver.com/") });
+
 
 	});
 </script>
@@ -256,6 +258,12 @@
 	</p>
 
 	<button id="button17">json 데이터 받기 2(hashmap)</button>
+
+	<br />
+	<button type="button" id="btnN">네이버</button>
+
+
+
 
 </body>
 </html>
