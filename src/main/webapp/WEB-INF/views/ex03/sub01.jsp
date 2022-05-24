@@ -22,164 +22,244 @@
 <meta charset="UTF-8">
 
 <script>
-	$(document).ready(function() {
+	$(document).ready(
+			function() {
 
-		$("#button1").click(function() {
+				$("#button1").click(function() {
 
-			$.ajax({
-				url : "/spr2/ex03/sub03"
-			});
-		});
+					$.ajax({
+						url : "/spr2/ex03/sub03"
+					});
+				});
 
-		$("#button2").click(function() {
-			$.ajax({
-				url : "/spr2/ex03/sub04"
-			});
-		});
+				$("#button2").click(function() {
+					$.ajax({
+						url : "/spr2/ex03/sub04"
+					});
+				});
 
-		$("#button3").click(function() {
-			$.ajax({
-				url : "/spr2/ex03/sub05",
-				type : "get"
-			});
-		});
+				$("#button3").click(function() {
+					$.ajax({
+						url : "/spr2/ex03/sub05",
+						type : "get"
+					});
+				});
 
-		$("#button4").click(function() {
-			$.ajax({
-				url : "/spr2/ex03/sub06",
-				type : "post"
-			//method : "post" 이거도 가능하다.
-			});
-		});
+				$("#button4").click(function() {
+					$.ajax({
+						url : "/spr2/ex03/sub06",
+						type : "post"
+					//method : "post" 이거도 가능하다.
+					});
+				});
 
-		$("#button5").click(function() {
-			$.ajax({
-				url : "/spr2/ex03/sub07",
-				type : "delete"
+				$("#button5").click(function() {
+					$.ajax({
+						url : "/spr2/ex03/sub07",
+						type : "delete"
+
+					});
+				});
+
+				$("#button6").click(function() {
+					$.ajax({
+						url : "/spr2/ex03/sub08",
+						type : "put"
+
+					});
+				});
+				$("#button7").click(function() {
+					$.ajax({
+						url : "/spr2/ex03/sub09",
+						//	type : "get" 타입의 기본값은 get이므로 생략 가능
+						data : {
+							title : "epl",
+							writer : "son"
+						}
+					});
+				});
+				$("#button8").click(function() {
+					$.ajax({
+						url : "/spr2/ex03/sub10",
+						type : "post",
+						data : {
+							name : "son",
+							address : "london"
+						}
+					});
+				});
+				$("#button9").click(function() {
+					$.ajax({
+						url : "/spr2/ex03/sub11",
+						type : "post",
+						data : {
+							title : "득점왕되기",
+							writer : "son"
+						}
+					});
+				});
+				$("#button10").click(function() {
+					$.ajax({
+						url : "/spr2/ex03/sub10",
+						type : "post",
+						data : "name=donald&address=newyork"
+					});
+				});
+				$("#button11").click(function() {
+					$.ajax({
+						url : "/spr2/ex03/sub11",
+						type : "post",
+						data : "title=골든부츠&writer=son"
+
+					});
+				});
+				$("#button12").click(function(e) {
+
+					e.preventDefault();
+					const dataString = $("#form1").serialize();
+
+					$.ajax({
+						url : "/spr2/ex03/sub10",
+						type : "post",
+						data : dataString
+
+					});
+				});
+				$("#button13").click(function(e) {
+					e.preventDefault();
+					const data = $("#form2").serialize();
+
+					$.ajax({
+						url : "/spr2/ex03/sub11",
+						type : "post",
+						data : data
+					});
+				});
+				$("#button14").click(function() {
+					$.ajax({
+						url : "/spr2/ex03/sub12",
+						type : "post",
+						success : function(data) {
+							console.log("요청성공!@#@!#");
+							console.log("받은 데이터", data);
+						}
+					});
+				});
+				$("#button15").click(function() {
+					$.ajax({
+						url : "/spr2/ex03/sub13",
+						type : "get",
+						success : function(data) {
+							//console.log(data);
+							$("#result1").text(data);
+						}
+					});
+				});
+				$("#button16").click(function() {
+					$.ajax({
+						url : "/spr2/ex03/sub14",
+						type : "get",
+						success : function(book) {
+							//console.log(book);
+							//console.log(book.title);
+							//console.log(book.writer);
+							$("#result2").text(book.title);
+							$("#result3").text(book.writer);
+						}
+					});
+				});
+				$("#button17").click(function() {
+					$.ajax({
+						url : "/spr2/ex03/sub15",
+						success : function(data) {
+							console.log(data);
+						}
+					});
+				});
+				$("#btnN").click(function() {
+					$(location).attr("href", "https://www.naver.com/")
+				});
+
+				$("#button18").click(function() {
+					$.ajax({
+						url : "spr2/ex03/sub16",
+						type : "get",
+						success : function(data) {
+							console.log(data);
+						},
+						error : function() {
+							console.log("뭔가 잘못됨");
+						}
+					});
+				});
+				$("#button19").click(function() {
+					$.ajax({
+						url : "spr2/ex03/sub16",
+						type : "get",
+						success : function(data) {
+							console.log(data);
+						},
+						error : function() {
+							$("#messege19").show();
+							$("#messege19").text("처리 중 오류 발생").fadeOut(3000);
+						}
+					});
+				});
+				$("#button20").click(function() {
+					$.ajax({
+						url : "/spr2/ex02/sub17",
+						success : function(data) {
+							console.log("받은 데이터", data);
+						},
+						error : function() {
+							console.log("뭔가 잘못되었다");
+						}
+					});
+				});
+				$("#button21").click(
+						function() {
+							$.ajax({
+								url : "/spr2/ex02/sub18",
+								success : function(data) {
+									$("#messege20").show();
+									$("#messege20").remove("error").text(data)
+											.fadeOut(3000);
+								},
+								error : function(data) {
+									$("#messege20").show();
+									$("#messege20").addClass("error").text(
+											"무엇인가 잘못됨").fadeOut(3000);
+								}
+							});
+						});
+				$("#button22").click(
+						function() {
+							$.ajax({
+								url : "/spr2/ex02/sub18",
+								success : function(data) {
+									$("#messege20").show();
+									$("#messege20").remove("error").text(data)
+											.fadeOut(3000);
+								},
+								error : function(data) {
+									$("#messege20").show();
+									$("#messege20").addClass("error").text(
+											"무엇인가 잘못됨").fadeOut(3000);
+								},
+								complete : function(){
+									console.log("항상 실행된다..");
+								}
+							});
+						});
 
 			});
-		});
-
-		$("#button6").click(function() {
-			$.ajax({
-				url : "/spr2/ex03/sub08",
-				type : "put"
-
-			});
-		});
-		$("#button7").click(function() {
-			$.ajax({
-				url : "/spr2/ex03/sub09",
-				//	type : "get" 타입의 기본값은 get이므로 생략 가능
-				data : {
-					title : "epl",
-					writer : "son"
-				}
-			});
-		});
-		$("#button8").click(function() {
-			$.ajax({
-				url : "/spr2/ex03/sub10",
-				type : "post",
-				data : {
-					name : "son",
-					address : "london"
-				}
-			});
-		});
-		$("#button9").click(function() {
-			$.ajax({
-				url : "/spr2/ex03/sub11",
-				type : "post",
-				data : {
-					title : "득점왕되기",
-					writer : "son"
-				}
-			});
-		});
-		$("#button10").click(function() {
-			$.ajax({
-				url : "/spr2/ex03/sub10",
-				type : "post",
-				data : "name=donald&address=newyork"
-			});
-		});
-		$("#button11").click(function() {
-			$.ajax({
-				url : "/spr2/ex03/sub11",
-				type : "post",
-				data : "title=골든부츠&writer=son"
-
-			});
-		});
-		$("#button12").click(function(e) {
-
-			e.preventDefault();
-			const dataString = $("#form1").serialize();
-
-			$.ajax({
-				url : "/spr2/ex03/sub10",
-				type : "post",
-				data : dataString
-
-			});
-		});
-		$("#button13").click(function(e) {
-			e.preventDefault();
-			const data = $("#form2").serialize();
-
-			$.ajax({
-				url : "/spr2/ex03/sub11",
-				type : "post",
-				data : data
-			});
-		});
-		$("#button14").click(function() {
-			$.ajax({
-				url : "/spr2/ex03/sub12",
-				type : "post",
-				success : function(data) {
-					console.log("요청성공!@#@!#");
-					console.log("받은 데이터", data);
-				}
-			});
-		});
-		$("#button15").click(function() {
-			$.ajax({
-				url : "/spr2/ex03/sub13",
-				type : "get",
-				success : function(data) {
-					//console.log(data);
-					$("#result1").text(data);
-				}
-			});
-		});
-		$("#button16").click(function() {
-			$.ajax({
-				url : "/spr2/ex03/sub14",
-				type : "get",
-				success : function(book) {
-					//console.log(book);
-					//console.log(book.title);
-					//console.log(book.writer);
-					$("#result2").text(book.title);
-					$("#result3").text(book.writer);
-				}
-			});
-		});
-		$("#button17").click(function() {
-			$.ajax({
-				url : "/spr2/ex03/sub15",
-				success : function(data) {
-					console.log(data);
-				}
-			});
-		});
-		$("#btnN").click(function(){ $(location).attr("href", "https://www.naver.com/") });
-
-
-	});
 </script>
+<style>
+.error {
+	background-color: red;
+	color: yellew;
+}
+</style>
 <title>Insert title here</title>
 </head>
 <body>
@@ -215,26 +295,18 @@
 
 	<p>폼 데이터 보내기</p>
 	<form id="form1" action="/spr2/ex03/sub10" method="post">
-		name :
-		<input type="text" name="name" />
-		<br />
-		address :
-		<input type="text" name="address" />
-		<br />
-		<input id="button12" type="submit" value="전송" />
+		name : <input type="text" name="name" /> <br /> address : <input
+			type="text" name="address" /> <br /> <input id="button12"
+			type="submit" value="전송" />
 
 
 	</form>
 	<%--/spr2/ex03/sub11로 포스트 방식 ajax 요청 전송 --%>
 	<p>폼 하나 더 만들어</p>
 	<form id="form2">
-		title :
-		<input type="text" name="title" />
-		<br />
-		writer :
-		<input type="text" name="writer" />
-		<br />
-		<input type="submit" value="전송" id="button13" />
+		title : <input type="text" name="title" /> <br /> writer : <input
+			type="text" name="writer" /> <br /> <input type="submit" value="전송"
+			id="button13" />
 	</form>
 	<hr />
 	<p>응답 처리하기</p>
@@ -243,27 +315,32 @@
 	<hr />
 	<button id="button15">로또번호다.</button>
 	<p>
-		받은 번호 :
-		<span id="result1"></span>
+		받은 번호 : <span id="result1"></span>
 	</p>
 	<hr />
 	<button id="button16">json 데이터 받기</button>
 	<p>
-		책 제목 :
-		<span id="result2"></span>
+		책 제목 : <span id="result2"></span>
 	</p>
 	<p>
-		책 저자 :
-		<span id="result3"></span>
+		책 저자 : <span id="result3"></span>
 	</p>
 
 	<button id="button17">json 데이터 받기 2(hashmap)</button>
 
 	<br />
 	<button type="button" id="btnN">네이버</button>
+	<br />
+	<p>요청이 실패할 경우</p>
+	<button id="button18">잘못된 요청</button>
 
-
-
-
+	<button id="button19">잘못된 요청2</button>
+	<p class="error" id="messege19"></p>
+	<button id="button20">서버에서 에러 응답</button>
+	<br />
+	<button id="button21">50%확률로 ok</button>
+	<p id="messege20"></p>
+	<br />
+	<button id="button22">50%확률로 ok</button>
 </body>
 </html>

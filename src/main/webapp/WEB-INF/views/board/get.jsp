@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@ taglib prefix="my" tagdir="/WEB-INF/tags" %>
+<%@ taglib prefix="my" tagdir="/WEB-INF/tags"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -26,46 +26,195 @@
 			$("#modify-submit1").removeClass("d-none");
 			$("#delete-submit1").removeClass("d-none");
 		});
-		
+
 		$("#delete-submit1").click(function(e) {
 			e.preventDefault();
-			
+
 			if (confirm("삭제하시겠습니까?")) {
 				let form1 = $("#form1");
 				let actionAttr = "${appRoot}/board/remove";
 				form1.attr("action", actionAttr);
-				
+
 				form1.submit();
 			}
+
+		});
+
+		//페이지 로딩 후 reply list 가져오는 ajax 요청
+		const listReply  = function(){
+		
+			const data = {boardId : ${board.id}};
+			$.ajax({
+				url:"${appRoot}/reply/list",
+				type:"get",
+				data: data,
+				success:function(list){
+					console.log(list);
+					
+					const replyListElement = $("#replyList1");
+					replyListElement.empty();
+					$("#numOfReply1").text(list.length);
+					
+					for(let i  = 0; i<list.length; i++){
+						const replyElement = $("<li class='list-group-item'/>");
+						replyElement.html(`
+								
+								
+									<div id="replyDisplayContainer\${list[i].id }">
+										<div class="fw-bold">
+											<i class="fa-solid fa-comment"></i> 
+											${reply.prettyInserted}
+										 	<span class="reply-edit-toggle-button badge bg-info text-dark" id="replyEditToggleButton\${list[i].id }" data-reply-id="\${list[i].id }" >
+										 		<i class="fa-solid fa-pen-to-square"></i>
+									 		</span>
+										 	<span class="reply-delete-button badge bg-danger" data-reply-id="\${list[i].id }">
+										 		<i class="fa-solid fa-trash-can"></i>
+										 	</span>
+										</div>
+								 		\${list[i].content }
+									 	
+									 	
+									</div>
+									
+									<div id="replyEditFormContainer\${list[i].id }" style="display: none;">
+										<form action="${appRoot }/reply/modify" method="post">
+											<div class="input-group">
+												<input type="hidden" name="boardId" value="${board.id }" />
+												<input type="hidden" name="id" value="\${list[i].id }" />
+												<input class="form-control" value="\${list[i].content }" type="text" name="content" required /> 
+												<button data-reply-id ="\${list[i].id}"
+													class="reply-modify-submit btn btn-outline-secondary">
+												<i class="fa-solid fa-comment-dots"></i></button>
+											</div>
+										</form>
+									</div>						 	
+								`);
+						replyListElement.append(replyElement);	
+						
+					 }//end of for
+					
+					$(".reply-modify-submit").click(function(e){
+						e.preventDefault();
+						
+						const id = $(this).attr("data-reply-id");
+						
+						const formElem = $("#replyEditFormContainer" + id).find("form");
+						
+						//const data = formElem.serialize(); put 방식은 컨트롤러에서 못받아
+						const data = {
+							boardId : formElem.find("[name=boardId]").val(),
+							id : formElem.find("[name=id]").val(),
+							content : formElem.find("[name=content]").val()
+						}
+						$.ajax({
+							url:"${appRoot}/reply/modify",
+							type:"put",
+							data : JSON.stringify(data),
+							contentType: "application/json",
+							success : function(){
+								console.log("수정성공");
+								
+								// 메세지 보여주기 
+								
+								// 댓글 refresh
+							},
+							error : function(){
+								console.log("수정실패");
+							},
+							complete : function(){
+								console.log("수정종료");
+							}
+							
+						});
+					
+					});
+					// reply-edit-toggle 버튼 클릭시 댓글 보여주는 div 숨기고,
+					// 수정 form 보여주기
+					$(".reply-edit-toggle-button").click(function() {
+						console.log("버튼클릭");
+						const replyId = $(this).attr("data-reply-id");
+						const displayDivId = "#replyDisplayContainer" + replyId;
+						const editFormId = "#replyEditFormContainer" + replyId;
+	
+						console.log(replyId);
+						console.log(displayDivId);
+						console.log(editFormId);
+	
+						$(displayDivId).hide();
+						$(editFormId).show();
+					});
+					
+					
+					// 삭제 버튼 클릭 이벤트 메소드 등록
+					// reply-delete-button 클릭시
+					$(".reply-delete-button").click(function() {
+						const replyId = $(this).attr("data-reply-id");
+						const message = "댓글을 삭제하시겠습니까?";
+	
+						if (confirm(message)) {
+							//	$("#replyDeleteInput1").val(replyId);
+							//	$("#replyDeleteForm1").submit();
+							$.ajax({
+								url:"${appRoot}/reply/delete/" + replyId,
+								type:"delete",
+								success : function(data){
+									//console.log("완전삭제");
+									//댓글 list refresh
+									listReply();
+									//메세지 출력
+									$("#replyMessage1").show().text(data).fadeOut(3000);
+									
+								},
+								error : function(){
+									console.log("문제발생");
+								},
+								complete : function(){
+									console.log("요청끝");
+								}
+							});
+						
+						}
+					});
+				},
+				error : function(){
+					consloe.log("댓글 가져오기 실패");
+				}
+				
+			});
+		
+		} 
+		//댓글 가져오는 함수 실행
+		listReply();
+		//addReplySubmitButton1버큰 글릭시 ajax 댓글 추가 요청
+		$("#addReplySubmitButton1").click(function(e){
+			e.preventDefault();
 			
+			const data = $("#insertReplyForm1").serialize();
+			
+			
+			$.ajax({
+				url:"${appRoot }/reply/insert",
+				type:"post",
+				data : data,
+				success : function(data){
+					// 새 댓글 등록되었다는 메시지 출력
+					$("#replyMessage1").show().text(data).fadeOut(3000);
+					// text input 초기화 
+					$("#insertReplyContentInput1").val("");
+					// 모든 댓글 가져오는 ajax 요청 
+					listReply();
+					//	console.log(data);
+				},
+				error : function(){
+					console.log("문제발생");
+				},
+				complie : function(){
+					console.log("요청완료");				
+					}
+				
+			});
 		});
 		
-		// reply-edit-toggle 버튼 클릭시 댓글 보여주는 div 숨기고,
-		// 수정 form 보여주기
-		$(".reply-edit-toggle-button").click(function() {
-			console.log("버튼클릭");
-			const replyId = $(this).attr("data-reply-id");
-			const displayDivId = "#replyDisplayContainer" + replyId;
-			const editFormId = "#replyEditFormContainer" + replyId;
-			
-			console.log(replyId);
-			console.log(displayDivId);
-			console.log(editFormId);
-			
-			$(displayDivId).hide();
-			$(editFormId).show();
-		});
-		
-		// reply-delete-button 클릭시
-		$(".reply-delete-button").click(function() {
-			const replyId = $(this).attr("data-reply-id");
-			const message = "댓글을 삭제하시겠습니까?";
-			
-			if (confirm(message)) {
-				$("#replyDeleteInput1").val(replyId);
-				$("#replyDeleteForm1").submit();
-			}
-		});
 	});
 </script>
 
@@ -77,25 +226,24 @@
 	<div class="container">
 		<div class="row">
 			<div class="col">
-				<h1>글 본문 
+				<h1>
+					글 본문
 					<button id="edit-button1" class="btn btn-secondary">
 						<i class="fa-solid fa-pen-to-square"></i>
 					</button>
 				</h1>
-				
+
 				<c:if test="${not empty message }">
-					<div class="alert alert-primary">
-						${message }
-					</div>
+					<div class="alert alert-primary">${message }</div>
 				</c:if>
-				
+
 				<form id="form1" action="${appRoot }/board/modify" method="post">
-					<input type="hidden" name="id" value="${board.id }"/>
-					
+					<input type="hidden" name="id" value="${board.id }" />
+
 					<div>
-						<label class="form-label" for="input1">제목</label>
-						<input class="form-control" type="text" name="title" required
-							id="input1" value="${board.title }" readonly/>
+						<label class="form-label" for="input1">제목</label> <input
+							class="form-control" type="text" name="title" required
+							id="input1" value="${board.title }" readonly />
 					</div>
 
 					<div>
@@ -103,47 +251,59 @@
 						<textarea class="form-control" name="body" id="textarea1"
 							cols="30" rows="10" readonly>${board.body }</textarea>
 					</div>
-					
+
 					<div>
-						<label for="input2" class="form-label">작성일시</label>
-						<input class="form-control" type="datetime-local" value="${board.inserted }" readonly/>
-					</div> 
-					
+						<label for="input2" class="form-label">작성일시</label> <input
+							class="form-control" type="datetime-local"
+							value="${board.inserted }" readonly />
+					</div>
+
 					<button id="modify-submit1" class="btn btn-primary d-none">수정</button>
 					<button id="delete-submit1" class="btn btn-danger d-none">삭제</button>
 				</form>
-					
+
 			</div>
 		</div>
 	</div>
-	
-	
+
+
 	<%-- 댓글 추가 form --%>
 	<!-- .container.mt-3>.row>.col>form -->
 	<div class="container mt-3">
 		<div class="row">
 			<div class="col">
-				<form action="${appRoot }/reply/insert" method="post">
+				<form id="insertReplyForm1">
 					<div class="input-group">
-						<input type="hidden" name="boardId" value="${board.id }" />
-						<input class="form-control" type="text" name="content" required /> 
-						<button class="btn btn-outline-secondary"><i class="fa-solid fa-comment-dots"></i></button>
+						<input type="hidden" name="boardId" value="${board.id }" /> <input
+							id="insertReplyContentInput1" class="form-control" type="text"
+							name="content" required />
+						<button id="addReplySubmitButton1"
+							class="btn btn-outline-secondary">
+							<i class="fa-solid fa-comment-dots"></i>
+						</button>
 					</div>
 				</form>
 			</div>
 		</div>
+		<div class="row">
+			<div class="alert alert-primary" style="display: none;"
+				id="replyMessage1"></div>
+		</div>
 	</div>
-	
+
 	<%-- 댓글 목록 --%>
-	
+
 	<!-- .container.mt-3>.row>.col -->
 	<div class="container mt-3">
 		<div class="row">
 			<div class="col">
-				<h3>댓글 ${board.numOfReply } 개</h3>
-			
-				<ul class="list-group">
-					<c:forEach items="${replyList }" var="reply">
+				<h3>
+					댓글<span id="numOfReply1"> </span> 개
+				</h3>
+
+				<ul id="replyList1" class="list-group">
+					<%-- 	
+				<c:forEach items="${replyList }" var="reply">
 						<li class="list-group-item">
 							<div id="replyDisplayContainer${reply.id }">
 								<div class="fw-bold">
@@ -175,16 +335,19 @@
 						 	
 						</li>
 					</c:forEach>
+					--%>
+
 				</ul>
 			</div>
 		</div>
 	</div>
-	
+
 	<%-- reply 삭제 form --%>
 	<div class="d-none">
-		<form id="replyDeleteForm1" action="${appRoot }/reply/delete" method="post">
-			<input id="replyDeleteInput1" type="text" name="id" />
-			<input type="text" name="boardId" value="${board.id }" />
+		<form id="replyDeleteForm1" action="${appRoot }/reply/delete"
+			method="post">
+			<input id="replyDeleteInput1" type="text" name="id" /> <input
+				type="text" name="boardId" value="${board.id }" />
 		</form>
 	</div>
 </body>
