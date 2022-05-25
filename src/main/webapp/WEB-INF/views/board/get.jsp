@@ -117,6 +117,7 @@
 								// 메세지 보여주기 
 								
 								// 댓글 refresh
+								listReply();
 							},
 							error : function(){
 								console.log("수정실패");
