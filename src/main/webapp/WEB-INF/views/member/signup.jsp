@@ -81,7 +81,7 @@
 				success : function(data) {
 					switch (data) {
 					case "ok":
-						emailOk = true;
+						
 						$("#idMessege2").text("사용 가능한 이메일입니다.");
 						emailOk = true;
 						break;
@@ -119,7 +119,7 @@
 				success : function(data) {
 					switch (data) {
 					case "ok":
-						nickNameOk = true;
+						
 						$("#idMessege3").text("사용 가능한 닉네임입니다.");
 						nickNameOk = true;
 						break;
@@ -189,7 +189,7 @@
 		<br />
 		닉네임:
 		<input type="text" name="nickName" />
-		<button id="checkIdButton3" type="button">id 중복 확인</button>
+		<button id="checkIdButton3" type="button">닉네임 중복 확인</button>
 		<p id="idMessege3"></p>
 		<br />
 

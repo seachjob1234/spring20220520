@@ -46,5 +46,15 @@
 	DELETE FROM Member
 	where id = #{id}
 	</delete>
+<update id="updateMember">
+	UPDATE Member
+	SET password=#{password},
+		email=#{email},
+		nickName=#{nickName}
+		where
+		id=#{id}
+
+</update>	
+
 
 </mapper>

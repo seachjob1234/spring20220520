@@ -102,4 +102,20 @@ public class MemberController {
 		}
 	
 	}
+@PostMapping("modify")
+public String modifyMember(MemberDto dto,String oldPassword, RedirectAttributes rttr) {
+	
+	boolean success = service.modifyMember(dto,oldPassword);
+	if(success) {
+		rttr.addFlashAttribute("messege", "회원정보가 수정되었다");
+	}else {
+		rttr.addFlashAttribute("messege", "회원 정보가 수정되지 않았다");
+	}
+	rttr.addFlashAttribute("member", dto);
+	rttr.addAttribute("id",dto.getId());
+	
+	return "redirect:/member/get";
+}
+	
+	
 }
