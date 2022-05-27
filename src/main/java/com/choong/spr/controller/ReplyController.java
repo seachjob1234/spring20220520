@@ -1,5 +1,6 @@
 package com.choong.spr.controller;
 
+import java.security.Principal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,6 +61,9 @@ public class ReplyController {
 	@DeleteMapping(path = "delete/{id}", produces = "text/plain;charset=UTF-8")
 
 	public ResponseEntity<String> delete(@PathVariable("id") int id) {
+		
+		
+		
 		boolean success = service.deleteReply(id);
 			
 		if (success) {

@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
 
 import com.choong.spr.domain.MemberDto;
 import com.choong.spr.mapper.MemberMapper;
@@ -26,8 +26,13 @@ public class MemberService {
 	
 	//암호화된 암호를 다시 세팅
 	member.setPassword(encoderPassword);
+	//insert member
+	int cnt1 = mapper.insertMember(member);
 	
-	 return mapper.insertMember(member) == 1;
+	// insert auth
+	int cnt2 = mapper.insertAuth(member.getId(), "ROLE_USER");
+	
+	 return cnt1== 1 && cnt2 == 1;
 	}
 
 	public boolean hasMemberId(String id) {
@@ -54,7 +59,8 @@ public class MemberService {
 		// TODO Auto-generated method stub
 		return mapper.selectMemberBtId(id);
 	}
-
+	
+	@Transactional
 	public boolean removeMember(MemberDto dto) {
 		// TODO Auto-generated method stub
 		MemberDto member = mapper.selectMemberBtId(dto.getId());
@@ -63,9 +69,21 @@ public class MemberService {
 		String encodedPW = member.getPassword();
 		
 		if(passwordEncoder.matches(rawPW, encodedPW)) {
-			return mapper.deleteMemberById(dto.getId()) == 1;
+			int cnt1 = mapper.deleteAuthById(dto.getId());
+			int cnt2 = mapper.deleteMemberById(dto.getId());
+			return cnt2 ==1;
 		}
 		return false;
+		/*	//암호화된 암호를 다시 세팅
+	member.setPassword(encoderPassword);
+	//insert member
+	int cnt1 = mapper.insertMember(member);
+	
+	// insert auth
+	int cnt2 = mapper.insertAuth(member.getId(), "ROLE_USER");
+	
+	 return cnt1== 1 && cnt2 == 1;
+*/
 	}
 
 	public boolean modifyMember(MemberDto dto, String oldPassword) {

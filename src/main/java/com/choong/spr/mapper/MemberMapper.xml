@@ -55,6 +55,17 @@
 		id=#{id}
 
 </update>	
+<!-- 권한 추기 -->
+
+<insert id = "insertAuth">
+INSERT INTO Auth(memberId, role)
+VALUES (#{id}, #{auth})
+
+</insert>
+<delete id = "deleteAuthById">
+DELETE FROM Auth
+where memberId = #{id}
+</delete>
 
 
 </mapper>

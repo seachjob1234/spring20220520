@@ -35,12 +35,12 @@ public class MemberController {
 		boolean success = service.addMember(member);
 
 		if (success) {
-			rttr.addFlashAttribute("messege","회원가입이 완료되었습니다" );
+			rttr.addFlashAttribute("message", "회원가입이 완료되었습니다");
 			return "redirect:/board/list";
 		} else {
-			rttr.addFlashAttribute("messege","회원가입이 실패하였습니다" );
+			rttr.addFlashAttribute("message", "회원가입이 실패하였습니다");
 			rttr.addFlashAttribute("member", member);
-			
+
 			return "redirect:/member/signup";
 		}
 	}
@@ -56,6 +56,7 @@ public class MemberController {
 			return "ok";
 		}
 	}
+
 	@GetMapping(path = "check", params = "email")
 	@ResponseBody
 	public String emailcheck(String email) {
@@ -67,6 +68,7 @@ public class MemberController {
 			return "ok";
 		}
 	}
+
 	@GetMapping(path = "check", params = "nickName")
 	@ResponseBody
 	public String nickNamecheck(String nickName) {
@@ -78,44 +80,52 @@ public class MemberController {
 			return "ok";
 		}
 	}
+
 	@GetMapping("list")
 	public void list(Model model) {
 		List<MemberDto> list = service.listMember();
-		model.addAttribute("memberList",list);
+		model.addAttribute("memberList", list);
 	}
+
 	@GetMapping("get")
 	public void getMember(String id, Model model) {
 		MemberDto member = service.getMemberById(id);
-		
-		model.addAttribute("member",member);
+
+		model.addAttribute("member", member);
 	}
+
 	@PostMapping("remove")
 	public String removeMember(MemberDto dto, RedirectAttributes rttr) {
 		boolean success = service.removeMember(dto);
-		
-		if(success) {
-			rttr.addFlashAttribute("messege", "회원 탈퇴 되었습니다.");
+
+		if (success) {
+			rttr.addFlashAttribute("message", "회원 탈퇴 되었습니다.");
 			return "redirect:/board/list";
-		}else {
+		} else {
 			rttr.addFlashAttribute("id", dto.getId());
 			return "redirect:/member/get";
 		}
-	
+
 	}
-@PostMapping("modify")
-public String modifyMember(MemberDto dto,String oldPassword, RedirectAttributes rttr) {
-	
-	boolean success = service.modifyMember(dto,oldPassword);
-	if(success) {
-		rttr.addFlashAttribute("messege", "회원정보가 수정되었다");
-	}else {
-		rttr.addFlashAttribute("messege", "회원 정보가 수정되지 않았다");
+
+	@PostMapping("modify")
+	public String modifyMember(MemberDto dto, String oldPassword, RedirectAttributes rttr) {
+
+		boolean success = service.modifyMember(dto, oldPassword);
+		if (success) {
+			rttr.addFlashAttribute("message", "회원정보가 수정되었다");
+		} else {
+			rttr.addFlashAttribute("message", "회원 정보가 수정되지 않았다");
+		}
+		rttr.addFlashAttribute("member", dto);
+		rttr.addAttribute("id", dto.getId());
+
+		return "redirect:/member/get";
 	}
-	rttr.addFlashAttribute("member", dto);
-	rttr.addAttribute("id",dto.getId());
-	
-	return "redirect:/member/get";
-}
-	
-	
+
+	@GetMapping("login")
+	public void loginPage() {
+
+	}
+
 }

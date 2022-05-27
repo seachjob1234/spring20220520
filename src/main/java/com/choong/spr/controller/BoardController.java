@@ -1,8 +1,10 @@
 package com.choong.spr.controller;
 
+import java.security.Principal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -47,8 +49,13 @@ public class BoardController {
 	}
 
 	@PostMapping("insert")
-	public String insert(BoardDto board, RedirectAttributes rttr) {
-		boolean success = service.insertBoard(board);
+	public String insert(BoardDto board, Principal principal, RedirectAttributes rttr) {
+
+		
+		board.setMemberId(principal.getName());
+		
+		
+		boolean success = service.insertBoard(board); 
 
 		if (success) {
 			rttr.addFlashAttribute("message", "새 글이 등록되었습니다.");
@@ -71,13 +78,22 @@ public class BoardController {
 	}
 
 	@PostMapping("modify")
-	public String modify(BoardDto dto, RedirectAttributes rttr) {
+	public String modify(BoardDto dto,Principal principal, RedirectAttributes rttr) {
+		
+		BoardDto oldBoard = service.getBoardById(dto.getId());
+		
+		if(oldBoard.getMemberId().equals(principal.getName())) {
+		
 		boolean success = service.updateBoard(dto);
-
+		
+		
 		if (success) {
 			rttr.addFlashAttribute("message", "글이 수정되었습니다.");
 		} else {
 			rttr.addFlashAttribute("message", "글이 수정되지 않았습니다.");
+		}
+		}else {
+			rttr.addFlashAttribute("message", "권한이 없습니다.");
 		}
 
 		rttr.addAttribute("id", dto.getId());
@@ -86,7 +102,12 @@ public class BoardController {
 	}
 
 	@PostMapping("remove")
-	public String remove(BoardDto dto, RedirectAttributes rttr) {
+	public String remove(BoardDto dto, Principal principal, RedirectAttributes rttr) {
+		
+		//게시물 정보 얻고 
+		BoardDto oldBoard = service.getBoardById(dto.getId());
+		//게시물 작성자 memberId화 principal의 name 과 비교해서 같을 때만 진행
+		if(oldBoard.getMemberId().equals(principal.getName())) {
 
 		boolean success = service.deleteBoard(dto.getId());
 
@@ -95,6 +116,9 @@ public class BoardController {
 
 		} else {
 			rttr.addFlashAttribute("message", "글이 삭제 되지않았습니다.");
+		}
+		}else {
+			rttr.addFlashAttribute("message","권한이 없습니다.");
 		}
 
 		return "redirect:/board/list";
