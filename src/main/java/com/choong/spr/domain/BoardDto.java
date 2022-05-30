@@ -25,4 +25,6 @@ public class BoardDto {
 			return inserted.toLocalDate().toString();
 		}
 	}
+
+	
 }

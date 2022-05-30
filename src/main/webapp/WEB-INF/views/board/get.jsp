@@ -2,7 +2,8 @@
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="my" tagdir="/WEB-INF/tags"%>
-<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+<%@ taglib prefix="sec"
+	uri="http://www.springframework.org/security/tags"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -64,15 +65,18 @@
 									<div id="replyDisplayContainer\${list[i].id }">
 										<div class="fw-bold">
 											<i class="fa-solid fa-comment"></i> 
-											${reply.prettyInserted}
-										 	<span class="reply-edit-toggle-button badge bg-info text-dark" id="replyEditToggleButton\${list[i].id }" data-reply-id="\${list[i].id }" >
-										 		<i class="fa-solid fa-pen-to-square"></i>
-									 		</span>
-										 	<span class="reply-delete-button badge bg-danger" data-reply-id="\${list[i].id }">
-										 		<i class="fa-solid fa-trash-can"></i>
-										 	</span>
+											\${list[i].prettyInserted}
+											
+											<span id ="modifyButtonWrapper\${list[i].id }">
+											
+											</span>
+										 	
 										</div>
-								 		\${list[i].content }
+										<span class="badge bg-light text-dark">
+											<i class="fa-solid fa-user"></i>
+											\${list[i].writerNickName}
+										</span>
+										<span id="replyContent\${list[i].id }"><span>
 									 	
 									 	
 									</div>
@@ -85,13 +89,29 @@
 												<input class="form-control" value="\${list[i].content }" type="text" name="content" required /> 
 												<button data-reply-id ="\${list[i].id}"
 													class="reply-modify-submit btn btn-outline-secondary">
-												<i class="fa-solid fa-comment-dots"></i></button>
+												<i class="fa-solid fa-comment -dots"></i></button>
 											</div>
 										</form>
 									</div>						 	
 								`);
 						replyListElement.append(replyElement);	
+						$("#replyContent" + list[i].id).text(list[i].content);
 						
+						   // own이 true일 때만 수정 삭제 버튼 보이기
+						 if(list[i].own) {
+							$("#modifyButtonWrapper" + list[i].id).html(`
+									<span class="reply-edit-toggle-button badge bg-info text-dark" 
+									id="replyEditToggleButton\${list[i].id }" 
+									data-reply-id="\${list[i].id }" >
+							 		<i class="fa-solid fa-pen-to-square"></i>
+						 		</span>
+							 	<span class="reply-delete-button badge bg-danger"
+							 	       data-reply-id="\${list[i].id }">
+							 		<i class="fa-solid fa-trash-can"></i>
+							 	</span>		
+							
+							`);
+						}
 					 }//end of for
 					
 					$(".reply-modify-submit").click(function(e){
@@ -116,11 +136,12 @@
 								console.log("수정성공");
 								
 								// 메세지 보여주기 
-								
+									$("#replyMessage1").show().text(data).fadeOut(3000);
 								// 댓글 refresh
 								listReply();
 							},
 							error : function(){
+								$("#replyMessage1").show().text("댓글을 수정할 수 없습니다.").fadeOut(3000);
 								console.log("수정실패");
 							},
 							complete : function(){
@@ -168,10 +189,11 @@
 									
 								},
 								error : function(){
-									console.log("문제발생");
+									$("#replyMessage1").show().text("댓글을 삭제할 수 없습니다.").fadeOut(3000);
+									console.log(replyId + "문제발생");
 								},
 								complete : function(){
-									console.log("요청끝");
+									console.log(replyId + "요청끝");
 								}
 							});
 						
@@ -208,7 +230,7 @@
 					//	console.log(data);
 				},
 				error : function(){
-					console.log("문제발생");
+					$("#replyMessage1").show().text("댓글을 작성할 수 없습니다.").fadeOut(3000);
 				},
 				complie : function(){
 					console.log("요청완료");				
@@ -218,7 +240,8 @@
 		});
 		
 	});
-</script>
+
+	</script>
 
 <title>Insert title here</title>
 </head>
@@ -231,17 +254,17 @@
 				<h1>
 					글 본문
 					<sec:authorize access="isAuthenticated()">
-					
-					<sec:authentication property="principal" var="principal"/>
-					<%--
+
+						<sec:authentication property="principal" var="principal" />
+						<%--
 					${principal.username}
 					${board.memberId}
 					 --%>
-					<c:if test="${principal.username == board.memberId }">
-					<button id="edit-button1" class="btn btn-secondary">
-						<i class="fa-solid fa-pen-to-square"></i>
-					</button>
-					</c:if>
+						<c:if test="${principal.username == board.memberId }">
+							<button id="edit-button1" class="btn btn-secondary">
+								<i class="fa-solid fa-pen-to-square"></i>
+							</button>
+						</c:if>
 					</sec:authorize>
 				</h1>
 
@@ -264,8 +287,8 @@
 							cols="30" rows="10" readonly>${board.body }</textarea>
 					</div>
 					<div>
-						<label for="input3" class="form-label">작성자</label>
-						<input id="input3" class="form-control" type="text"
+						<label for="input3" class="form-label">작성자</label> <input
+							id="input3" class="form-control" type="text"
 							value="${board.writerNickName }" readonly />
 					</div>
 

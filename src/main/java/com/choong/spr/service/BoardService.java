@@ -48,6 +48,8 @@ public class BoardService {
 		return mapper.deleteBoard(id) == 1;
 	}
 
+	
+
 
 
 }

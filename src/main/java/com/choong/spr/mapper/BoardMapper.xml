@@ -78,4 +78,17 @@
 		DELETE FROM Board
 		WHERE id = #{id }
 	</delete>
+	
+	<select  id="listByMemberId" resultType="com.choong.spr.domain.BoardDto">
+	select id
+	from Board
+	where memberId = #{memberId}
+	</select>
+	<delete id="deleteByMemberId">
+	delete from Board
+	where memberId=#{memberId}
+	
+	
+	</delete>
+	
 </mapper>
