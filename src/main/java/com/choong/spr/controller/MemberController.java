@@ -1,5 +1,6 @@
 package com.choong.spr.controller;
 
+import java.security.Principal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,10 +89,16 @@ public class MemberController {
 	}
 
 	@GetMapping("get")
-	public void getMember(String id, Model model) {
-		MemberDto member = service.getMemberById(id);
-
-		model.addAttribute("member", member);
+	public String getMember(String id, Model model,Principal principal) {
+		
+		if(principal !=null && principal.getName().equals(id)) {
+				MemberDto member = service.getMemberById(id);
+				model.addAttribute("member", member);	
+				
+				return null;
+			}
+		return "redirect:/member/login";
+		
 	}
 
 	@PostMapping("remove")

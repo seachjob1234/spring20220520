@@ -202,7 +202,7 @@
 </script>
 </head>
 <body>
-	<my:navBar></my:navBar>
+	<my:navBar current="memberInfo"></my:navBar>
 	<div>
 		<p>${messege }</p>
 	</div>
