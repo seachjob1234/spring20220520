@@ -286,11 +286,13 @@
 						<textarea class="form-control" name="body" id="textarea1"
 							cols="30" rows="10" readonly>${board.body }</textarea>
 					</div>
+					<c:forEach items="${board.fileName }" var = "file">
 					<div>
-						<img src="C:/imgtmp/board/${board.id }/${board.fileName }" alt="" />
+				<%--https://bucket0207-0122.s3.ap-northeast-2.amazonaws.com/board/98/166a4e253021dac3d.png --%>	
+						<img src="${imageUrl }/board/${board.id }/${file}" alt="" />
 					
 					</div>
-					
+					</c:forEach>
 					<div>
 						<label for="input3" class="form-label">작성자</label> <input
 							id="input3" class="form-control" type="text"
