@@ -62,18 +62,22 @@ public class BoardService {
 		// 게시글 등록
 		int cnt = mapper.insertBoard(board);
 
+		addFiles(board.getId(), files);
+
+		return cnt == 1;
+	}
+
+	private void addFiles(int id, MultipartFile[] files) {
 		// 파일 등록
 		if (files != null) {
 			for (MultipartFile file : files) {
 				if (file.getSize() > 0) {
-					mapper.insertFile(board.getId(), file.getOriginalFilename());
+					mapper.insertFile(id, file.getOriginalFilename());
 					// saveFile(board.getId(),file); //desktop임시//나중에aws에
-					saveFileAwsS3(board.getId(), file); // s3에 업로드
+					saveFileAwsS3(id, file); // s3에 업로드
 				}
 			}
 		}
-
-		return cnt == 1;
 	}
 
 	private void saveFileAwsS3(int id, MultipartFile file) {
@@ -120,15 +124,35 @@ public class BoardService {
 		return board;
 	}
 
-	public boolean updateBoard(BoardDto dto) {
+	public boolean updateBoard(BoardDto dto, MultipartFile[] addFileList, List<String> removeFileList) {
+		if(removeFileList != null) {
+			for(String fileName : removeFileList) {
+				deleteFromAwsS3(dto.getId(), fileName);
+				mapper.deleteFileByBoardIdAndFileName(dto.getId(), fileName);
+			}
+			
+		}
+		
+		if(addFileList != null) {
+			//file테이블에 추가된 파일 insert
+			// 그리고 s3에 업로드 하고 
+			addFiles(dto.getId(), addFileList);
+		
+		}
+		// boardtable 업데이트 
+		int cnt =  mapper.updateBoard(dto) ;
+		 return cnt == 1;
+	}
+
+	private void deleteFromAwsS3(int id, String fileName) {
 		// TODO Auto-generated method stub
-		return mapper.updateBoard(dto) == 1;
+		
 	}
 
 	@Transactional
 	public boolean deleteBoard(int id) {
 		// 파일 목록 읽기
-		String fileName = mapper.selectFileByBoardId(id);
+		List<String> fileList = mapper.selectFileNameByBoard(id);
 
 		// 실제파일 삭제
 		/*
@@ -139,17 +163,23 @@ public class BoardService {
 		 * 
 		 * File dir = new File(folder); dir.delete(); }
 		 */
-		// s3에서 지우기
-		deleteFormAwsS3(id, fileName);
-
-		// 파일 테이블 삭제
-		mapper.deleteFileByBoardId(id);
+		removeFiles(id, fileList);
 
 		// 댓글테이블 삭제
 
 		replyMapper.deleteByBoardId(id);
 
 		return mapper.deleteBoard(id) == 1;
+	}
+
+	private void removeFiles(int id, List<String> fileList) {
+		// s3에서 지우기
+		for(String fileName : fileList ) {
+			deleteFormAwsS3(id, fileName);
+		}	
+
+		// 파일 테이블 삭제
+		mapper.deleteFileByBoardId(id);
 	}
 
 	private void deleteFormAwsS3(int id, String fileName) {

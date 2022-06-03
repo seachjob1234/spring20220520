@@ -91,71 +91,73 @@ public class MemberController {
 	}
 
 	@GetMapping("get")
-	public String getMember(String id, Model model,Principal principal, HttpServletRequest request) {
-		
-		if(hasAuthOrAdmin(id, principal,request)) {
-				MemberDto member = service.getMemberById(id);
-				model.addAttribute("member", member);	
-				
-				return null;
-			}
+	public String getMember(String id, Model model, Principal principal, HttpServletRequest request) {
+
+		if (hasAuthOrAdmin(id, principal, request)) {
+			MemberDto member = service.getMemberById(id);
+			model.addAttribute("member", member);
+
+			return null;
+		}
 		return "redirect:/member/login";
-		
+
 	}
-	private boolean hasAuthOrAdmin(String id,Principal principal,HttpServletRequest req) {
-		return req.isUserInRole("ROLE_ADMIN") || (principal !=null && principal.getName().equals(id));
+
+	private boolean hasAuthOrAdmin(String id, Principal principal, HttpServletRequest req) {
+		return req.isUserInRole("ROLE_ADMIN") || (principal != null && principal.getName().equals(id));
 	}
-	
+
 	@PostMapping("remove")
 	public String removeMember(MemberDto dto, RedirectAttributes rttr, Principal principal, HttpServletRequest req) {
-			
+
 		if (hasAuthOrAdmin(dto.getId(), principal, req)) {
 			boolean success = service.removeMember(dto);
-		
-		if (success) {
-			rttr.addFlashAttribute("message", "회원 탈퇴 되었습니다.");
-			return "redirect:/board/list";
+
+			if (success) {
+				rttr.addFlashAttribute("message", "회원 탈퇴 되었습니다.");
+				return "redirect:/board/list";
+			} else {
+				rttr.addFlashAttribute("id", dto.getId());
+				return "redirect:/member/get";
+			}
 		} else {
-			rttr.addFlashAttribute("id", dto.getId());
-			return "redirect:/member/get";
-		}
-		}else {
 			return "redirect:/member/login";
 		}
 
 	}
 
 	@PostMapping("modify")
-	public String modifyMember(MemberDto dto, String oldPassword,Principal principal,
-			HttpServletRequest req, RedirectAttributes rttr) {
+	public String modifyMember(MemberDto dto, String oldPassword, Principal principal, HttpServletRequest req,
+			RedirectAttributes rttr) {
 		if (hasAuthOrAdmin(dto.getId(), principal, req)) {
-		boolean success = service.modifyMember(dto, oldPassword);
-		if (success) {
-			rttr.addFlashAttribute("message", "회원정보가 수정되었다");
-		} else {
-			rttr.addFlashAttribute("message", "회원 정보가 수정되지 않았다");
-		}
-		rttr.addFlashAttribute("member", dto);
-		rttr.addAttribute("id", dto.getId());
+			boolean success = service.modifyMember(dto, oldPassword);
+			if (success) {
+				rttr.addFlashAttribute("message", "회원정보가 수정되었다");
+			} else {
+				rttr.addFlashAttribute("message", "회원 정보가 수정되지 않았다");
+			}
+			rttr.addFlashAttribute("member", dto);
+			rttr.addAttribute("id", dto.getId());
 
-		return "redirect:/member/get";
-	}else {
-		return "redirect:/member/login";
+			return "redirect:/board/list";
+		} else {
+			return "redirect:/member/login";
+		}
 	}
-	}
+
 	@GetMapping("login")
 	public void loginPage() {
 
 	}
-	
+
 	@GetMapping("initpw")
 	public void initpwPage() {
-		
+
 	}
-	
+
 	@PostMapping("initpw")
 	public String initPassword(String id) {
 		service.initPassword(id);
 		return "redirect:/board/list";
-		}
+	}
 }

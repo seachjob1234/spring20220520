@@ -27,6 +27,8 @@
 			$("#textarea1").removeAttr("readonly");
 			$("#modify-submit1").removeClass("d-none");
 			$("#delete-submit1").removeClass("d-none");
+			$("#addFileInputContainer1").removeClass("d-none");
+			$(".removeFileCheckBox").removeClass("d-none");
 		});
 
 		$("#delete-submit1").click(function(e) {
@@ -272,12 +274,13 @@
 					<div class="alert alert-primary">${message }</div>
 				</c:if>
 
-				<form id="form1" action="${appRoot }/board/modify" method="post">
+				<form id="form1" action="${appRoot }/board/modify" method="post"
+					enctype="multipart/form-data">
 					<input type="hidden" name="id" value="${board.id }" />
 
 					<div>
-						<label class="form-label" for="input1">제목</label> <input
-							class="form-control" type="text" name="title" required
+						<label class="form-label" for="input1">제목</label>
+						<input class="form-control" type="text" name="title" required
 							id="input1" value="${board.title }" readonly />
 					</div>
 
@@ -286,22 +289,43 @@
 						<textarea class="form-control" name="body" id="textarea1"
 							cols="30" rows="10" readonly>${board.body }</textarea>
 					</div>
-					<c:forEach items="${board.fileName }" var = "file">
-					<div>
-				<%--https://bucket0207-0122.s3.ap-northeast-2.amazonaws.com/board/98/166a4e253021dac3d.png --%>	
-						<img src="${imageUrl }/board/${board.id }/${file}" alt="" />
-					
-					</div>
+					<c:forEach items="${board.fileName }" var="file">
+						<%
+							String file = (String) pageContext.getAttribute("file");
+						String encodedFileName = java.net.URLEncoder.encode(file, "utf-8");
+						pageContext.setAttribute("encodedFileName", encodedFileName);
+						%>
+						<div class="row">
+							<div class="col-1">
+								<div class="d-none removeFileCheckBox">
+									삭제<br />
+									<input type="checkbox" name="removeFileList" value="${file }" />
+								</div>
+							</div>
+							<div class="col-11"></div>
+						</div>
+						<div>
+							<%--https://bucket0207-0122.s3.ap-northeast-2.amazonaws.com/board/98/166a4e253021dac3d.png --%>
+							<img class="img-Fluld"
+								src="${imageUrl }/board/${board.id }/${encodedFileName }" alt="" />
+
+						</div>
 					</c:forEach>
+
+					<div id="addFileInputContainer1" class="d-none">
+						파일 추가 :
+						<input type="File" accept="image/*" multiple="multiple" name="addFileList" />
+					</div>
+
 					<div>
-						<label for="input3" class="form-label">작성자</label> <input
-							id="input3" class="form-control" type="text"
+						<label for="input3" class="form-label">작성자</label>
+						<input id="input3" class="form-control" type="text"
 							value="${board.writerNickName }" readonly />
 					</div>
 
 					<div>
-						<label for="input2" class="form-label">작성일시</label> <input
-							class="form-control" type="datetime-local"
+						<label for="input2" class="form-label">작성일시</label>
+						<input class="form-control" type="datetime-local"
 							value="${board.inserted }" readonly />
 					</div>
 
@@ -321,9 +345,9 @@
 			<div class="col">
 				<form id="insertReplyForm1">
 					<div class="input-group">
-						<input type="hidden" name="boardId" value="${board.id }" /> <input
-							id="insertReplyContentInput1" class="form-control" type="text"
-							name="content" required />
+						<input type="hidden" name="boardId" value="${board.id }" />
+						<input id="insertReplyContentInput1" class="form-control"
+							type="text" name="content" required />
 						<button id="addReplySubmitButton1"
 							class="btn btn-outline-secondary">
 							<i class="fa-solid fa-comment-dots"></i>
@@ -345,7 +369,9 @@
 		<div class="row">
 			<div class="col">
 				<h3>
-					댓글<span id="numOfReply1"> </span> 개
+					댓글
+					<span id="numOfReply1"> </span>
+					개
 				</h3>
 
 				<ul id="replyList1" class="list-group">
@@ -393,8 +419,8 @@
 	<div class="d-none">
 		<form id="replyDeleteForm1" action="${appRoot }/reply/delete"
 			method="post">
-			<input id="replyDeleteInput1" type="text" name="id" /> <input
-				type="text" name="boardId" value="${board.id }" />
+			<input id="replyDeleteInput1" type="text" name="id" />
+			<input type="text" name="boardId" value="${board.id }" />
 		</form>
 	</div>
 </body>
